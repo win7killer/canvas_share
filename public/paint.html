@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #111;
+            color: #eee;
+        }
+
+        p {
+            line-height: 24px;
+        }
+
+        .canImage {
+            position: absolute;
+            left: 100px;
+            top: 0;
+        }
+
+        .wrap {
+            width: 800px;
+            margin: 100px auto;
+            text-align: center;
+            font: 16px '微软雅黑';
+        }
+
+        .noCanvas {
+            color: #fefefe;
+        }
+
+        .noCanvas a {
+            color: #f90;
+            padding: 0 20px;
+        }
+
+        .noCanvas a:hover {
+            color: #09f;
+        }
+
+        .noCanvas strong {
+            font-size: 30px;
+            color: #f90;
+            padding: 0 10px;
+        }
+
+        .canPaint {
+            border: 1px solid #333;
+            position: absolute;
+            top: 0;
+            left: 100px;
+        }
+
+        .change {
+            position: fixed;
+            bottom: 100px;
+            right: 100px;
+        }
+
+        .change a {
+            display: block;
+            margin: 10px;
+            padding: 5px 10px;
+            color: #eee;
+            background: #f90;
+            border-radius: 4px;
+            text-decoration: none;
+        }
+
+        .change a:hover {
+            color: #fff;
+            background: #f60;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <canvas id="canImage" class="canImage" width="1000" height="600"></canvas>
+        <canvas class="canPaint" id="canPaint" width="1000" height="600">
+            <div class="noCanvas">
+                <p>不支持canvas的浏览器你也用，太<strong>low</strong>了，赶紧换浏览器去吧！</p>
+                <a href="http://www.google.cn/intl/zh-CN/chrome/" class="toChrome">chrome官网</a>
+                ||
+                <a href="https://dlsw.baidu.com/sw-search-sp/soft/9d/14744/ChromeStandaloneSetup.1414465267.exe"
+                    class="getChrome">下载chrome离线安装包</a>
+            </div>
+        </canvas>
+    </div>
+    <div class="change">
+        <a href="javascript:;" class="draw">涂一涂</a>
+        <a href="javascript:;" class="clear">擦一擦</a>
+        <a href="javascript:;" class="scrape">刮一刮</a>
+    </div>
+</body>
+<script>
+    /**
+     * @author win7killer
+     * @date 2014.11.14
+     * @verson 1.0
+     */
+    (function () {
+        var oDraw = document.getElementsByClassName('draw')[0];
+        var oClear = document.getElementsByClassName('clear')[0];
+        var oScrape = document.getElementsByClassName('scrape')[0];
+        oDraw.onclick = function () {
+            oCtx.globalCompositeOperation = 'destination-out';
+            oCtx.fillStyle = 'rgba(0,0,0,255)';
+            oCtx.fillRect(0, 0, oCan.width, oCan.height);
+            oCtx.globalCompositeOperation = 'source-over';
+            oCtx.strokeStyle = '#0f6';
+            paintFn();
+        };
+        oClear.onclick = function () {
+            oCtx.globalCompositeOperation = 'destination-out';
+            oCtx.strokeStyle = '#f90';
+            paintFn();
+        };
+        oScrape.onclick = function () {
+            oCtx.globalCompositeOperation = 'source-over';
+            oCtx.fillStyle = '#666';
+            oCtx.fillRect(0, 0, oCan.width, oCan.height);
+            oCtx.strokeStyle = '#f90';
+            oCtx.globalCompositeOperation = 'destination-out';
+            paintFn();
+        };
+        function init() {
+            var oCan = document.getElementById('canPaint');
+            var oCtx = {};
+            if (oCan.getContext) {
+                oCtx = oCan.getContext('2d');
+            }
+            window.oCtx = oCtx;
+            window.oCan = oCan;
+            drawImg('./3.png');
+            reset();
+            oDraw.click();
+        }
+        function drawImg(sUrl) {
+            var oC1 = document.getElementById('canImage');
+            var ctx = oC1.getContext('2d');
+            var img = new Image();
+            img.onload = function () {
+                ctx.drawImage(img, 0, 0);
+            };
+            img.src = sUrl;
+        }
+        function reset() {
+            oCtx.lineJoin = oCtx.lineCap = "round";
+            oCtx.lineWidth = 10.0;
+        }
+        function paintFn() {
+            oCan.onmousedown = function (e) {
+                console.log(111);
+                var ev = e || event;
+                var op = {};
+                op.ex = op.bx = e.clientX - oCan.offsetLeft;
+                op.ey = op.by = e.clientY - oCan.offsetTop;
+                draw(op);
+                document.onmousemove = function (e) {
+                    document.body.style.cursor = 'pointer';
+                    var ev = e || event;
+                    op.bx = op.ex;
+                    op.by = op.ey;
+                    op.ex = e.clientX - oCan.offsetLeft;
+                    op.ey = e.clientY - oCan.offsetTop;
+                    draw(op);
+                };
+                document.onmouseup = function () {
+                    document.body.style.cursor = 'default';
+                    document.onmouseup = document.onmousemove = null;
+                };
+            };
+
+        }
+        function draw(option) {
+            oCtx.beginPath();
+            oCtx.moveTo(option.bx, option.by);
+            oCtx.lineTo(option.ex, option.ey);
+            oCtx.stroke();
+        }
+
+        init();
+    })();
+</script>
+
+</html>
