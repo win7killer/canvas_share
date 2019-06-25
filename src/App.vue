@@ -23,7 +23,7 @@
 </template>
 
 <script>
-const dpr = 2;
+const dpr = 1;
 import routers from './router';
 
 
@@ -54,6 +54,7 @@ export default {
         console.log(111)
         console.log(this);
         this.$root.can = this.can = this.$refs.can;
+        this.$root.dpr = this.dpr;
         this.$root.ctx = this.ctx = this.can.getContext('2d');
         this.isMoutend = true;
     }

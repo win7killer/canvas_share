@@ -39,5 +39,11 @@ export default new Router({
     }, {
         path: '/math',
         component: () => import('./components/middle/Math')
+    }, {
+        path: '/ac',
+        component: () => import('./components/Ac')
+    }, {
+        path: '/smooth',
+        component: () => import('./components/Smooth')
     }]
 });
